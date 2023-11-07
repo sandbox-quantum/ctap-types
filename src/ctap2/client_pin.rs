@@ -55,6 +55,10 @@ pub struct Request {
     // Encrypted first 16 bytes of SHA-256 of PIN using `sharedSecret`.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub pin_hash_enc: Option<Bytes<64>>,
+
+     // 0x07
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub key_agreement_pqc: Option<Bytes<1088>>,
 }
 
 #[derive(Clone, Debug, Eq, PartialEq, SerializeIndexed, DeserializeIndexed)]
@@ -62,7 +66,10 @@ pub struct Request {
 pub struct Response {
     // 0x01, like ClientPinParameters::key_agreement
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub key_agreement: Option<EcdhEsHkdf256PublicKey>,
+    pub key_agreement: Option<crate::cose::Kyber768PublicKey>,
+    // Uncooment below line to support conventional KEM algo instead of PQC 
+    // pub key_agreement: Option<EcdhEsHkdf256PublicKey>,
+
 
     // 0x02, encrypted `pinToken` using `sharedSecret`
     #[serde(skip_serializing_if = "Option::is_none")]

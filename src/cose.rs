@@ -66,6 +66,8 @@ enum Kty {
     Okp = 1,
     Ec2 = 2,
     Symmetric = 4,
+    LWE = 5,
+    PQCKEM = 6,
 }
 
 impl Expected for Kty {
@@ -80,6 +82,8 @@ enum Alg {
     Es256 = -7, // ECDSA with SHA-256
     EdDsa = -8,
     Totp = -9, // Unassigned, we use it for TOTP
+    CRYDI3 = -20,
+    KYBER768 = -24,
 
     // MAC
     // Hs256 = 5,
@@ -126,6 +130,8 @@ impl Expected for Crv {
 #[serde(untagged)]
 pub enum PublicKey {
     P256Key(P256PublicKey),
+    Dil3Key(Dil3PublicKey),
+    Kyber768Key(Kyber768PublicKey),
     EcdhEsHkdf256Key(EcdhEsHkdf256PublicKey),
     Ed25519Key(Ed25519PublicKey),
     TotpKey(TotpPublicKey),
@@ -134,6 +140,18 @@ pub enum PublicKey {
 impl From<P256PublicKey> for PublicKey {
     fn from(key: P256PublicKey) -> Self {
         PublicKey::P256Key(key)
+    }
+}
+
+impl From<Dil3PublicKey> for PublicKey {
+    fn from(key: Dil3PublicKey) -> Self {
+        PublicKey::Dil3Key(key)
+    }
+}
+
+impl From<Kyber768PublicKey> for PublicKey {
+    fn from(key: Kyber768PublicKey) -> Self {
+        PublicKey::Kyber768Key(key)
     }
 }
 
@@ -319,6 +337,28 @@ impl From<Ed25519PublicKey> for RawPublicKey {
     }
 }
 
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct Dil3PublicKey {
+    pub x: Bytes<1952>,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct Kyber768PublicKey {
+    pub x: Bytes<1184>,
+}
+
+impl PublicKeyConstants for Dil3PublicKey {
+    const KTY: Kty = Kty::LWE;
+    const ALG: Alg = Alg::CRYDI3;
+    const CRV: Crv = Crv::None;
+}
+
+impl PublicKeyConstants for Kyber768PublicKey {
+    const KTY: Kty = Kty::PQCKEM;
+    const ALG: Alg = Alg::KYBER768;
+    const CRV: Crv = Crv::None;
+}
+
 #[derive(Clone, Debug, Default, Eq, PartialEq, Serialize)]
 #[serde(into = "RawPublicKey")]
 pub struct TotpPublicKey {}
@@ -367,6 +407,91 @@ fn check_key_constants<K: PublicKeyConstants, E: serde::de::Error>(
         }
     }
     Ok(())
+}
+
+impl serde::Serialize for Dil3PublicKey {
+    fn serialize<S>(&self, serializer: S) -> core::result::Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        use serde::ser::SerializeMap;
+        let mut map = serializer.serialize_map(Some(3))?;
+
+        //  1: kty
+        map.serialize_entry(&(Label::Kty as i8), &(Self::KTY as i8))?;
+        //  3: alg
+        map.serialize_entry(&(Label::Alg as i8), &(Self::ALG as i8))?;
+        // -2: x
+        map.serialize_entry(&(Label::X as i8), &self.x)?;
+
+        map.end()
+    }
+}
+
+impl serde::Serialize for Kyber768PublicKey {
+    fn serialize<S>(&self, serializer: S) -> core::result::Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        info_now!("in kyber serialzie");
+        use serde::ser::SerializeMap;
+        let mut map = serializer.serialize_map(Some(3))?;
+
+        //  1: kty
+        map.serialize_entry(&(Label::Kty as i8), &(Self::KTY as i8))?;
+        //  3: alg
+        map.serialize_entry(&(Label::Alg as i8), &(Self::ALG as i8))?;
+        // // -1: crv
+        // map.serialize_entry(&(Label::Crv as i8), &(Self::CRV as i8))?;
+        // -2: x
+        map.serialize_entry(&(Label::X as i8), &self.x)?;
+
+        map.end()
+    }
+}
+
+impl serde::Serialize for EcdhEsHkdf256PublicKey {
+    fn serialize<S>(&self, serializer: S) -> core::result::Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        use serde::ser::SerializeMap;
+        let mut map = serializer.serialize_map(Some(5))?;
+
+        //  1: kty
+        map.serialize_entry(&(Label::Kty as i8), &(Self::KTY as i8))?;
+        //  3: alg
+        map.serialize_entry(&(Label::Alg as i8), &(Self::ALG as i8))?;
+        // -1: crv
+        map.serialize_entry(&(Label::Crv as i8), &(Self::CRV as i8))?;
+        // -2: x
+        map.serialize_entry(&(Label::X as i8), &self.x)?;
+        // -3: y
+        map.serialize_entry(&(Label::Y as i8), &self.y)?;
+
+        map.end()
+    }
+}
+
+impl serde::Serialize for Ed25519PublicKey {
+    fn serialize<S>(&self, serializer: S) -> core::result::Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        use serde::ser::SerializeMap;
+        let mut map = serializer.serialize_map(Some(4))?;
+
+        //  1: kty
+        map.serialize_entry(&(Label::Kty as i8), &(Self::KTY as i8))?;
+        //  3: alg
+        map.serialize_entry(&(Label::Alg as i8), &(Self::ALG as i8))?;
+        // -1: crv
+        map.serialize_entry(&(Label::Crv as i8), &(Self::CRV as i8))?;
+        // -2: pub_key
+        map.serialize_entry(&(Label::X as i8), &self.x)?;
+
+        map.end()
+    }
 }
 
 impl<'de> serde::Deserialize<'de> for P256PublicKey {
@@ -418,5 +543,108 @@ impl<'de> serde::Deserialize<'de> for Ed25519PublicKey {
         check_key_constants::<Ed25519PublicKey, D::Error>(kty, alg, crv)?;
         let x = x.ok_or_else(|| D::Error::missing_field("x"))?;
         Ok(Self { x })
+    }
+}
+
+impl<'de> serde::Deserialize<'de> for Dil3PublicKey {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        struct IndexedVisitor;
+        impl<'de> serde::de::Visitor<'de> for IndexedVisitor {
+            type Value = Dil3PublicKey;
+
+            fn expecting(&self, formatter: &mut core::fmt::Formatter) -> core::fmt::Result {
+                formatter.write_str("Dil3PublicKey")
+            }
+
+            fn visit_map<V>(self, mut map: V) -> Result<Dil3PublicKey, V::Error>
+            where
+                V: serde::de::MapAccess<'de>,
+            {
+                // implies kty-specific params
+                match (map.next_key()?, map.next_value()?) {
+                    (Some(Label::Kty), Some(Dil3PublicKey::KTY)) => {}
+                    _ => {
+                        return Err(serde::de::Error::missing_field("kty"));
+                    }
+                }
+
+                // restricts key usage - check!
+                match (map.next_key()?, map.next_value()?) {
+                    (Some(Label::Alg), Some(Dil3PublicKey::ALG)) => {}
+                    _ => {
+                        return Err(serde::de::Error::missing_field("alg"));
+                    }
+                }
+
+                let x = match (map.next_key()?, map.next_value()?) {
+                    (Some(Label::X), Some(bytes)) => bytes,
+                    _ => {
+                        return Err(serde::de::Error::missing_field("x"));
+                    }
+                };
+
+                Ok(Dil3PublicKey { x })
+            }
+        }
+        deserializer.deserialize_map(IndexedVisitor {})
+    }
+}
+
+impl<'de> serde::Deserialize<'de> for Kyber768PublicKey {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        struct IndexedVisitor;
+        impl<'de> serde::de::Visitor<'de> for IndexedVisitor {
+            type Value = Kyber768PublicKey;
+
+            fn expecting(&self, formatter: &mut core::fmt::Formatter) -> core::fmt::Result {
+                formatter.write_str("Kyber768PublicKey")
+            }
+
+            fn visit_map<V>(self, mut map: V) -> Result<Kyber768PublicKey, V::Error>
+            where
+                V: serde::de::MapAccess<'de>,
+            {
+                info_now!("in kyber deserialize");
+
+                // implies kty-specific params
+                match (map.next_key()?, map.next_value()?) {
+                    (Some(Label::Kty), Some(Kyber768PublicKey::KTY)) => {}
+                    _ => {
+                        return Err(serde::de::Error::missing_field("kty"));
+                    }
+                }
+
+                // restricts key usage - check!
+                match (map.next_key()?, map.next_value()?) {
+                    (Some(Label::Alg), Some(Kyber768PublicKey::ALG)) => {}
+                    _ => {
+                        return Err(serde::de::Error::missing_field("alg"));
+                    }
+                }
+
+                // match (map.next_key()?, map.next_value()?) {
+                //     (Some(Label::Crv), Some(Kyber768PublicKey::CRV)) => {}
+                //     _ => {
+                //         return Err(serde::de::Error::missing_field("crv"));
+                //     }
+                // }
+
+                let x = match (map.next_key()?, map.next_value()?) {
+                    (Some(Label::X), Some(bytes)) => bytes,
+                    _ => {
+                        return Err(serde::de::Error::missing_field("x"));
+                    }
+                };
+
+                Ok(Kyber768PublicKey { x })
+            }
+        }
+        deserializer.deserialize_map(IndexedVisitor {})
     }
 }
