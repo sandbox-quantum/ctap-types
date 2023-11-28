@@ -450,50 +450,6 @@ impl serde::Serialize for Kyber768PublicKey {
     }
 }
 
-impl serde::Serialize for EcdhEsHkdf256PublicKey {
-    fn serialize<S>(&self, serializer: S) -> core::result::Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        use serde::ser::SerializeMap;
-        let mut map = serializer.serialize_map(Some(5))?;
-
-        //  1: kty
-        map.serialize_entry(&(Label::Kty as i8), &(Self::KTY as i8))?;
-        //  3: alg
-        map.serialize_entry(&(Label::Alg as i8), &(Self::ALG as i8))?;
-        // -1: crv
-        map.serialize_entry(&(Label::Crv as i8), &(Self::CRV as i8))?;
-        // -2: x
-        map.serialize_entry(&(Label::X as i8), &self.x)?;
-        // -3: y
-        map.serialize_entry(&(Label::Y as i8), &self.y)?;
-
-        map.end()
-    }
-}
-
-impl serde::Serialize for Ed25519PublicKey {
-    fn serialize<S>(&self, serializer: S) -> core::result::Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        use serde::ser::SerializeMap;
-        let mut map = serializer.serialize_map(Some(4))?;
-
-        //  1: kty
-        map.serialize_entry(&(Label::Kty as i8), &(Self::KTY as i8))?;
-        //  3: alg
-        map.serialize_entry(&(Label::Alg as i8), &(Self::ALG as i8))?;
-        // -1: crv
-        map.serialize_entry(&(Label::Crv as i8), &(Self::CRV as i8))?;
-        // -2: pub_key
-        map.serialize_entry(&(Label::X as i8), &self.x)?;
-
-        map.end()
-    }
-}
-
 impl<'de> serde::Deserialize<'de> for P256PublicKey {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
