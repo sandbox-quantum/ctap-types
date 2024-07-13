@@ -73,7 +73,7 @@ pub struct Request<'a> {
 
     // 0x07
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub(crate) _placeholder07: Option<()>,
+    pub key_agreement_pqc: Option<Bytes<1088>>,
 
     // 0x08
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -136,7 +136,7 @@ mod tests {
             pin_auth: None,
             new_pin_enc: None,
             pin_hash_enc: None,
-            _placeholder07: None,
+            key_agreement_pqc: None,
             _placeholder08: None,
             permissions: None,
             rp_id: None,
@@ -165,7 +165,7 @@ mod tests {
             pin_auth: None,
             new_pin_enc: None,
             pin_hash_enc: None,
-            _placeholder07: None,
+            key_agreement_pqc: None,
             _placeholder08: None,
             permissions: None,
             rp_id: None,
@@ -198,7 +198,7 @@ mod tests {
             pin_auth: Some(serde_bytes::Bytes::new(PIN_AUTH)),
             new_pin_enc: Some(serde_bytes::Bytes::new(NEW_PIN_ENC)),
             pin_hash_enc: None,
-            _placeholder07: None,
+            key_agreement_pqc: None,
             _placeholder08: None,
             permissions: None,
             rp_id: None,
@@ -256,7 +256,7 @@ mod tests {
             pin_auth: Some(serde_bytes::Bytes::new(PIN_AUTH)),
             new_pin_enc: Some(serde_bytes::Bytes::new(NEW_PIN_ENC)),
             pin_hash_enc: Some(serde_bytes::Bytes::new(PIN_HASH_ENC)),
-            _placeholder07: None,
+            key_agreement_pqc: None,
             _placeholder08: None,
             permissions: None,
             rp_id: None,
@@ -317,7 +317,7 @@ mod tests {
             pin_auth: None,
             new_pin_enc: None,
             pin_hash_enc: Some(serde_bytes::Bytes::new(PIN_HASH_ENC)),
-            _placeholder07: None,
+            key_agreement_pqc: None,
             _placeholder08: None,
             permissions: None,
             rp_id: None,
@@ -372,7 +372,7 @@ mod tests {
             pin_auth: None,
             new_pin_enc: None,
             pin_hash_enc: Some(serde_bytes::Bytes::new(PIN_HASH_ENC)),
-            _placeholder07: None,
+            key_agreement_pqc: None,
             _placeholder08: None,
             permissions: Some(0x04),
             rp_id: Some("example.com"),

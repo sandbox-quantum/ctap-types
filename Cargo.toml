@@ -11,13 +11,13 @@ repository = "https://github.com/trussed-dev/ctap-types"
 arbitrary = { version = "1.3.2", features = ["derive"], optional = true }
 bitflags = "1.3"
 cbor-smol = "0.4"
-cosey = "0.3.1"
+cosey = { path = "../cosey_fork" }
 delog = "0.1"
 heapless = { version = "0.7", default-features = false, features = ["serde"] }
 heapless-bytes = "0.3"
 iso7816 = "0.1.2"
 serde = { version = "1", default-features = false, features = ["derive"] }
-serde-indexed = "0.1.1"
+serde-indexed = "0.1.0"
 serde_bytes = { version = "0.11.14", default-features = false }
 serde_repr = "0.1"
 
