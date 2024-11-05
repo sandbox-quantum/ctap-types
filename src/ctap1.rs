@@ -30,6 +30,7 @@ pub mod authenticate {
 
 pub mod register {
     use super::Bytes;
+    use crate::sizes::MAX_MESSAGE_LENGTH;
 
     #[derive(Clone, Debug, Eq, PartialEq)]
     pub struct Request<'a> {
@@ -42,7 +43,7 @@ pub mod register {
         pub header_byte: u8,
         pub public_key: Bytes<65>,
         pub key_handle: Bytes<255>,
-        pub attestation_certificate: Bytes<1024>,
+        pub attestation_certificate: Bytes<MAX_MESSAGE_LENGTH>,
         pub signature: Bytes<72>,
     }
 
@@ -52,7 +53,7 @@ pub mod register {
             public_key: &cosey::EcdhEsHkdf256PublicKey,
             key_handle: Bytes<255>,
             signature: Bytes<72>,
-            attestation_certificate: Bytes<1024>,
+            attestation_certificate: Bytes<MAX_MESSAGE_LENGTH>,
         ) -> Self {
             let mut public_key_bytes = Bytes::new();
             public_key_bytes.push(0x04).unwrap();

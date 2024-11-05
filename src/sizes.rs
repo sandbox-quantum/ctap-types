@@ -30,3 +30,16 @@ pub const THEORETICAL_MAX_MESSAGE_SIZE: usize = PACKET_SIZE - 7 + 128 * (PACKET_
 pub const LARGE_BLOB_MAX_FRAGMENT_LENGTH: usize = 0;
 #[cfg(feature = "large-blobs")]
 pub const LARGE_BLOB_MAX_FRAGMENT_LENGTH: usize = 3008;
+
+// TODO: update these, and grab them from a common crate?
+cfg_if::cfg_if! {
+    if #[cfg(feature = "backend-dilithium5")] {
+        pub const MAX_MESSAGE_LENGTH: usize = 7523 + 57 + 30;
+    } else if #[cfg(feature = "backend-dilithium3")] {
+        pub const MAX_MESSAGE_LENGTH: usize = 6019 + 57 + 30;
+    } else if #[cfg(feature = "backend-dilithium2")] {
+        pub const MAX_MESSAGE_LENGTH: usize = 3907 + 57 + 30;
+    } else {
+        pub const MAX_MESSAGE_LENGTH: usize = 1024;
+    }
+}
