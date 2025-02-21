@@ -158,25 +158,25 @@ pub enum UnknownPKCredentialParam {
 pub const ES256: i32 = -7;
 /// EdDSA
 pub const ED_DSA: i32 = -8;
-/// Dilithium2
-#[cfg(feature = "backend-dilithium2")]
-pub const DILITHIUM2: i32 = -87;
-#[cfg(feature = "backend-dilithium3")]
-pub const DILITHIUM3: i32 = -88;
-#[cfg(feature = "backend-dilithium5")]
-pub const DILITHIUM5: i32 = -89;
+/// ML0DSA
+#[cfg(feature = "backend-mldsa-44")]
+pub const MLDSA44: i32 = -87;
+#[cfg(feature = "backend-mldsa-65")]
+pub const MLDSA65: i32 = -88;
+#[cfg(feature = "backend-mldsa-87")]
+pub const MLDSA87: i32 = -89;
 
 // Dynamically calculate the number of different known algorithms
 pub const COUNT_KNOWN_ALGS: usize =
-    2 + (if cfg!(feature = "backend-dilithium2") {
+    2 + (if cfg!(feature = "backend-mldsa-44") {
         1
     } else {
         0
-    }) + (if cfg!(feature = "backend-dilithium3") {
+    }) + (if cfg!(feature = "backend-mldsa-65") {
         1
     } else {
         0
-    }) + (if cfg!(feature = "backend-dilithium5") {
+    }) + (if cfg!(feature = "backend-mldsa-87") {
         1
     } else {
         0
@@ -185,12 +185,12 @@ pub const COUNT_KNOWN_ALGS: usize =
 pub const KNOWN_ALGS: [i32; COUNT_KNOWN_ALGS] = [
     ES256,
     ED_DSA,
-    #[cfg(feature = "backend-dilithium2")]
-    DILITHIUM2,
-    #[cfg(feature = "backend-dilithium3")]
-    DILITHIUM3,
-    #[cfg(feature = "backend-dilithium5")]
-    DILITHIUM5,
+    #[cfg(feature = "backend-mldsa-44")]
+    MLDSA44,
+    #[cfg(feature = "backend-mldsa-65")]
+    MLDSA65,
+    #[cfg(feature = "backend-mldsa-87")]
+    MLDSA87,
 ];
 
 impl TryFrom<PublicKeyCredentialParameters> for KnownPublicKeyCredentialParameters {

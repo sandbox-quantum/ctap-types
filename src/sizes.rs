@@ -30,17 +30,17 @@ pub const LARGE_BLOB_MAX_FRAGMENT_LENGTH: usize = 3008;
 
 // TODO: update these, and grab them from a common crate?
 cfg_if::cfg_if! {
-    if #[cfg(feature = "backend-dilithium5")] {
+    if #[cfg(feature = "backend-mldsa-87")] {
         pub const MAX_MESSAGE_LENGTH: usize = MAX_COMMITTMENT_LENGTH;
         pub const MAX_CREDENTIAL_ID_LENGTH: usize = 7523 + 57 + 30 + 37;
         pub const AUTHENTICATOR_DATA_LENGTH: usize = MAX_CREDENTIAL_ID_LENGTH + 2031; // TODO: this will have to be larger
         pub const ASN1_SIGNATURE_LENGTH: usize = 4627;
-    } else if #[cfg(feature = "backend-dilithium3")] {
+    } else if #[cfg(feature = "backend-mldsa-65")] {
         pub const MAX_MESSAGE_LENGTH: usize = MAX_COMMITTMENT_LENGTH;
         pub const MAX_CREDENTIAL_ID_LENGTH: usize =  6019 + 57 + 30 + 37;
         pub const AUTHENTICATOR_DATA_LENGTH: usize = MAX_CREDENTIAL_ID_LENGTH + 2031;
         pub const ASN1_SIGNATURE_LENGTH: usize = 3309;
-    } else if #[cfg(feature = "backend-dilithium2")] {
+    } else if #[cfg(feature = "backend-mldsa-44")] {
         pub const MAX_MESSAGE_LENGTH: usize = MAX_COMMITTMENT_LENGTH;
         pub const MAX_CREDENTIAL_ID_LENGTH: usize = 3907 + 57 + 30 + 37;
         pub const AUTHENTICATOR_DATA_LENGTH: usize = MAX_CREDENTIAL_ID_LENGTH + 2031; // TODO: this can be smaller

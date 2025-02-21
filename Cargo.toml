@@ -37,9 +37,9 @@ get-info-full = []
 large-blobs = []
 third-party-payment = []
 
-backend-dilithium2 = []
-backend-dilithium3 = []
-backend-dilithium5 = []
+backend-mldsa-44 = []
+backend-mldsa-65 = []
+backend-mldsa-87 = []
 
 log-all = []
 log-none = []
