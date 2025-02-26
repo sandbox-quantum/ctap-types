@@ -37,9 +37,9 @@ get-info-full = []
 large-blobs = []
 third-party-payment = []
 
-backend-mldsa-44 = []
-backend-mldsa-65 = []
-backend-mldsa-87 = []
+mldsa44 = []
+mldsa65 = []
+mldsa87 = []
 
 log-all = []
 log-none = []
